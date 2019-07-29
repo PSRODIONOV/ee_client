@@ -1,5 +1,6 @@
 import javax.xml.soap.*;
 import java.net.URL;
+import java.util.Random;
 
 public class Application {
 
@@ -11,6 +12,7 @@ public class Application {
 
     public static void main(String[] args){
 
+
         try {
             while(true) {
                 URL url = new URL("http://localhost:8083/flowershop/ws/FlowersStockWebService?wsdl");
@@ -19,6 +21,7 @@ public class Application {
                 SOAPMessage soapRequest = createSoapRequest();
                 SOAPMessage soapResponse = soapConnection.call(soapRequest, url);
                 soapConnection.close();
+                Thread.sleep(10*1000);//**10 минут
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -29,6 +32,8 @@ public class Application {
 
     /** Создание SOAP запроса **/
     private static SOAPMessage createSoapRequest() throws Exception{
+        Random rand = new Random();
+        Integer number = rand.nextInt(20)+10;
         MessageFactory messageFactory = MessageFactory.newInstance(); //**фабрика для создания экземпляра SOAPMessage
         SOAPMessage soapMessage = messageFactory.createMessage(); //**Документ XML или сообщение MIME
         SOAPPart soapPart = soapMessage.getSOAPPart();  //**Контейнер для SOAP-определенной части SOAPMessage
@@ -37,7 +42,7 @@ public class Application {
         SOAPBody soapBody = soapEnvelope.getBody(); //**Объект для тела SOAP для сообщения SOAP
         SOAPElement soapElement = soapBody.addChildElement("increaseFlowersStockSize", "web"); //**Добавление в тело Вызываемый метод
         SOAPElement element1 = soapElement.addChildElement("request"); //**создание параметра с именем request
-        element1.addTextNode("100"); //**Добавление значения в element1
+        element1.addTextNode(number.toString()); //**Добавление значения в element1
         soapMessage.saveChanges(); //**
         return soapMessage;
     }
